@@ -146,7 +146,7 @@ class HomePage {
     const url = "https://www.amtrak.com/home";
     // Do not cy.visit Amtrak: Cypress would fetch it through Node (HTTP/1.1),
     // which GitHub runners stall on. Chrome can load HTTP/2 via CDP instead.
-    cy.visit("data:text/html,<!doctype html><title></title>");
+    cy.visit("https://example.com", { failOnStatusCode: false });
     cy.then(() =>
       Cypress.automation("remote:debugger:protocol", {
         command: "Page.enable",
