@@ -46,8 +46,6 @@ jobs:
         run: |
           ipv4=$(getent ahostsv4 www.amtrak.com | awk '{print $1; exit}')
           echo "$ipv4 www.amtrak.com amtrak.com" | sudo tee -a /etc/hosts
-          curl -sS -o /dev/null -w "GET http_code=%{http_code} time=%{time_total}\n" --max-time 20 https://www.amtrak.com/home || true
-          node -e "require('https').get('https://www.amtrak.com/home',{headers:{'user-agent':'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36'}},(r)=>{console.log('node_status',r.statusCode);r.resume()}).on('error',(e)=>{console.error('node_error',e.message);process.exit(0)})"
       - name: e2e tests
         run: npm run test
       - name: Upload Cypress report artifact

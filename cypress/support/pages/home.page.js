@@ -143,13 +143,23 @@ class HomePage {
   }
 
   open() {
-    cy.visit("/home", {
-      timeout: 120_000,
-      retryOnNetworkFailure: true,
-    });
+    const url = `${Cypress.config("baseUrl")}/home`;
+    // cy.visit() still talks to Amtrak through Node, which GitHub runners
+    // stall on (Akamai HTTP/2). Chrome can load the page over HTTP/2 via CDP.
+    cy.visit("about:blank");
+    cy.then(() =>
+      Cypress.automation("remote:debugger:protocol", {
+        command: "Page.enable",
+      }).then(() =>
+        Cypress.automation("remote:debugger:protocol", {
+          command: "Page.navigate",
+          params: { url },
+        }),
+      ),
+    );
     cy.stubThirdPartyBeacons();
     this.dismissCookieBanner();
-    this.fareFinder().should("be.visible");
+    this.fareFinder().should("be.visible", { timeout: 120_000 });
     this.dismissSignInPrompt();
   }
 
