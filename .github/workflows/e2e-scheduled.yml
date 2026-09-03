@@ -44,6 +44,10 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      - name: Pin Amtrak to IPv4
+        run: |
+          ipv4=$(getent ahostsv4 www.amtrak.com | awk '{print $1; exit}')
+          echo "$ipv4 www.amtrak.com amtrak.com" | sudo tee -a /etc/hosts
       - name: e2e tests
         run: npm run test
       - name: Upload Cypress report artifact

@@ -53,10 +53,15 @@ module.exports = defineConfig({
       cypressGrepPlugin(config);
       on("before:browser:launch", (browser, launchOptions) => {
         if (browser.family === "chromium") {
-          // GitHub runners drop UDP, so Chrome HTTP/3/QUIC stalls on Akamai
-          // until Cypress reports ETIMEDOUT. Playwright's bundled Chromium
-          // does not use QUIC the same way.
           launchOptions.args.push("--disable-quic");
+          try {
+            const ip = dns.lookupSync("www.amtrak.com", { family: 4 }).address;
+            launchOptions.args.push(
+              `--host-resolver-rules=MAP www.amtrak.com ${ip},MAP amtrak.com ${ip}`,
+            );
+          } catch {
+            // fall back to OS DNS
+          }
         }
         return launchOptions;
       });
