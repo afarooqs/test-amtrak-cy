@@ -143,10 +143,10 @@ class HomePage {
   }
 
   open() {
-    const url = `${Cypress.config("baseUrl")}/home`;
-    // cy.visit() still talks to Amtrak through Node, which GitHub runners
-    // stall on (Akamai HTTP/2). Chrome can load the page over HTTP/2 via CDP.
-    cy.visit("about:blank");
+    const url = "https://www.amtrak.com/home";
+    // Do not cy.visit Amtrak: Cypress would fetch it through Node (HTTP/1.1),
+    // which GitHub runners stall on. Chrome can load HTTP/2 via CDP instead.
+    cy.visit("data:text/html,<!doctype html><title></title>");
     cy.then(() =>
       Cypress.automation("remote:debugger:protocol", {
         command: "Page.enable",

@@ -44,7 +44,8 @@ module.exports = defineConfig({
     videoOnFailOnly: false,
   },
   e2e: {
-    baseUrl: "https://www.amtrak.com",
+    // No baseUrl: Cypress would HTTP/1.1-proxy Amtrak during spec setup and
+    // time out on GitHub-hosted runners. Tests open the app through Chrome CDP.
     specPattern: "cypress/e2e/**/*.cy.js",
     supportFile: "cypress/support/e2e.js",
     testIsolation: true,
