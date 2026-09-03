@@ -9,7 +9,7 @@ require("./commands");
 // fare-finder behavior instead of third-party script load order.
 Cypress.on("uncaught:exception", () => false);
 
-beforeEach(() => {
+Cypress.Commands.add("stubThirdPartyBeacons", () => {
   const blocked = [
     "**/*.dynatrace.com/**",
     "**/*.decibelinsight.net/**",

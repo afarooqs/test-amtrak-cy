@@ -147,6 +147,7 @@ class HomePage {
       timeout: 120_000,
       retryOnNetworkFailure: true,
     });
+    cy.stubThirdPartyBeacons();
     this.dismissCookieBanner();
     this.fareFinder().should("be.visible");
     this.dismissSignInPrompt();

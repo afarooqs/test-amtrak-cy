@@ -42,6 +42,10 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      - name: Check Amtrak from the runner
+        run: |
+          getent ahosts www.amtrak.com | head -20
+          curl -sS -o /dev/null -w "http_code=%{http_code} time=%{time_total} err=%{errormsg}\n" --max-time 20 -I https://www.amtrak.com/home || true
       - name: smoke tests
         run: npm run test:smoke
       - name: Upload Cypress report artifact
