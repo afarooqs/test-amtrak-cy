@@ -53,15 +53,11 @@ module.exports = defineConfig({
       cypressGrepPlugin(config);
       on("before:browser:launch", (browser, launchOptions) => {
         if (browser.family === "chromium") {
-          launchOptions.args.push("--disable-quic");
-          try {
-            const ip = dns.lookupSync("www.amtrak.com", { family: 4 }).address;
-            launchOptions.args.push(
-              `--host-resolver-rules=MAP www.amtrak.com ${ip},MAP amtrak.com ${ip}`,
-            );
-          } catch {
-            // fall back to OS DNS
-          }
+          launchOptions.args.push(
+            "--disable-quic",
+            "--dns-over-https-mode=off",
+            "--disable-features=AsyncDns,HttpsUpgrades,UseDnsHttpsSvcb",
+          );
         }
         return launchOptions;
       });
