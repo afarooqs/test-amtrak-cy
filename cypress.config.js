@@ -7,6 +7,13 @@ const { plugin: cypressGrepPlugin } = require("@cypress/grep/plugin");
 // even though Chrome itself is fine. Prefer IPv4 in this process.
 dns.setDefaultResultOrder("ipv4first");
 
+const ciUserAgent = process.env.CI
+  ? {
+      userAgent:
+        "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    }
+  : {};
+
 module.exports = defineConfig({
   video: true,
   videosFolder: "cypress/videos",
@@ -24,6 +31,7 @@ module.exports = defineConfig({
   viewportHeight: 900,
   chromeWebSecurity: false,
   modifyObstructiveCode: false,
+  ...ciUserAgent,
   numTestsKeptInMemory: 0,
   reporter: "cypress-mochawesome-reporter",
   reporterOptions: {
@@ -44,8 +52,11 @@ module.exports = defineConfig({
       require("cypress-mochawesome-reporter/plugin")(on);
       cypressGrepPlugin(config);
       on("before:browser:launch", (browser, launchOptions) => {
-        if (process.env.CI && browser.family === "chromium") {
-          launchOptions.args.push("--disable-ipv6");
+        if (browser.family === "chromium") {
+          // GitHub runners drop UDP, so Chrome HTTP/3/QUIC stalls on Akamai
+          // until Cypress reports ETIMEDOUT. Playwright's bundled Chromium
+          // does not use QUIC the same way.
+          launchOptions.args.push("--disable-quic");
         }
         return launchOptions;
       });
