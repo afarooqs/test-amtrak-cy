@@ -145,21 +145,18 @@ class HomePage {
   open() {
     const url = "https://www.amtrak.com/home";
     // Do not cy.visit Amtrak: Cypress would fetch it through Node (HTTP/1.1),
-    // which GitHub runners stall on. Chrome can load HTTP/2 via CDP instead.
+    // which GitHub runners stall on. Let Chrome navigate itself over HTTP/2.
     cy.visit("https://example.com", { failOnStatusCode: false });
-    cy.then(() =>
-      Cypress.automation("remote:debugger:protocol", {
-        command: "Page.enable",
-      }).then(() =>
-        Cypress.automation("remote:debugger:protocol", {
-          command: "Page.navigate",
-          params: { url },
-        }),
-      ),
+    cy.window().then((win) => {
+      win.location.href = url;
+    });
+    cy.location("hostname", { timeout: 120_000 }).should(
+      "eq",
+      "www.amtrak.com",
     );
     cy.stubThirdPartyBeacons();
     this.dismissCookieBanner();
-    this.fareFinder().should("be.visible", { timeout: 120_000 });
+    this.fareFinder().should("be.visible");
     this.dismissSignInPrompt();
   }
 
