@@ -1,0 +1,13 @@
+node_modules/
+cypress/videos/
+cypress/screenshots/
+cypress/downloads/
+cypress-report/
+test-results/
+.DS_Store
+*.log
+.env
+.env.*
+auth.json
+.cursor/
+*.mdc

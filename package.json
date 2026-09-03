@@ -1,0 +1,33 @@
+{
+  "name": "test-amtrak-cy",
+  "version": "1.0.0",
+  "private": true,
+  "license": "MIT",
+  "description": "Data-driven Cypress tests for Amtrak.com search",
+  "scripts": {
+    "test": "cypress run --browser chrome",
+    "test:headed": "cypress run --headed --browser chrome",
+    "test:open": "cypress open --e2e --browser chrome",
+    "test:cross-browser": "node scripts/run-cross-browser.js",
+    "test:mobile": "cypress run --browser chrome --config viewportWidth=412,viewportHeight=915 && cypress run --browser chrome --config viewportWidth=390,viewportHeight=844",
+    "test:report": "open cypress-report/index.html",
+    "test:smoke": "cypress run --browser chrome --expose grepTags=@smoke",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "prettier": "prettier --check .",
+    "prettier:fix": "prettier --write ."
+  },
+  "devDependencies": {
+    "@cypress/grep": "^7.0.0",
+    "@eslint/js": "^9.15.0",
+    "cypress": "^16.0.0",
+    "cypress-mochawesome-reporter": "^4.0.0",
+    "eslint": "^9.15.0",
+    "eslint-plugin-cypress": "^5.1.0",
+    "globals": "^15.12.0",
+    "prettier": "3.9.6"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
