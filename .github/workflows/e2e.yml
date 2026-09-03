@@ -2,6 +2,7 @@ name: E2E Tests
 
 env:
   ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: "true"
+  NODE_OPTIONS: "--dns-result-order=ipv4first"
 
 on:
   push:

@@ -1,5 +1,11 @@
+const dns = require("node:dns");
 const { defineConfig } = require("cypress");
 const { plugin: cypressGrepPlugin } = require("@cypress/grep/plugin");
+
+// GitHub-hosted runners often have unreachable IPv6. Node 17+ tries AAAA
+// first, so Cypress's visit/proxy hangs with ETIMEDOUT against Amtrak/Akamai
+// even though Chrome itself is fine. Prefer IPv4 in this process.
+dns.setDefaultResultOrder("ipv4first");
 
 module.exports = defineConfig({
   video: true,
@@ -37,6 +43,12 @@ module.exports = defineConfig({
     setupNodeEvents(on, config) {
       require("cypress-mochawesome-reporter/plugin")(on);
       cypressGrepPlugin(config);
+      on("before:browser:launch", (browser, launchOptions) => {
+        if (process.env.CI && browser.family === "chromium") {
+          launchOptions.args.push("--disable-ipv6");
+        }
+        return launchOptions;
+      });
       return config;
     },
   },
