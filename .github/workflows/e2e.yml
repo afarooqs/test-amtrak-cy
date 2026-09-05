@@ -1,7 +1,6 @@
 name: E2E Tests
 
 env:
-  ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: "true"
   NODE_OPTIONS: "--dns-result-order=ipv4first"
 
 on:
@@ -50,14 +49,15 @@ jobs:
         run: npm run test
       - name: Upload Cypress report artifact
         if: always()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: cypress-report
           path: cypress-report
+          include-hidden-files: true
           retention-days: 10
       - name: Upload test results
         if: always()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: test-results
           path: |
@@ -66,9 +66,10 @@ jobs:
           retention-days: 5
       - name: Upload GitHub Pages artifact
         if: always() && github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
-        uses: actions/upload-pages-artifact@v4
+        uses: actions/upload-pages-artifact@v5
         with:
           path: cypress-report
+          include-hidden-files: true
 
   pages:
     name: Publish report to GitHub Pages
@@ -81,4 +82,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5

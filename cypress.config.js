@@ -8,6 +8,7 @@ const {
 const {
   createEsbuildPlugin,
 } = require("@badeball/cypress-cucumber-preprocessor/esbuild");
+const cypressOnFix = require("cypress-on-fix");
 
 // GitHub-hosted runners often have unreachable IPv6. Node 17+ tries AAAA
 // first, so Cypress's visit/proxy hangs with ETIMEDOUT against Amtrak/Akamai
@@ -59,7 +60,10 @@ module.exports = defineConfig({
     specPattern: "cypress/e2e/features/**/*.feature",
     supportFile: "cypress/support/e2e.js",
     testIsolation: true,
-    async setupNodeEvents(on, config) {
+    async setupNodeEvents(cypressOn, config) {
+      // Cucumber and mochawesome both register after:run; without this
+      // wrapper only one handler runs and the HTML report is never written.
+      const on = cypressOnFix(cypressOn);
       require("cypress-mochawesome-reporter/plugin")(on);
       cypressGrepPlugin(config);
       await addCucumberPreprocessorPlugin(on, config);
