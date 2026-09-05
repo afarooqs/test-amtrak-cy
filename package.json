@@ -11,17 +11,20 @@
     "test:cross-browser": "node scripts/run-cross-browser.js",
     "test:mobile": "cypress run --browser chrome --config viewportWidth=412,viewportHeight=915 && cypress run --browser chrome --config viewportWidth=390,viewportHeight=844",
     "test:report": "open cypress-report/index.html",
-    "test:smoke": "cypress run --browser chrome --expose grepTags=@smoke",
+    "test:smoke": "cypress run --browser chrome --env TAGS=\"@smoke\"",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "prettier": "prettier --check .",
     "prettier:fix": "prettier --write ."
   },
   "devDependencies": {
+    "@badeball/cypress-cucumber-preprocessor": "^28.0.0",
+    "@bahmutov/cypress-esbuild-preprocessor": "^2.2.8",
     "@cypress/grep": "^7.0.0",
     "@eslint/js": "^9.15.0",
     "cypress": "^16.0.0",
     "cypress-mochawesome-reporter": "^4.0.0",
+    "esbuild": "^0.28.2",
     "eslint": "^9.15.0",
     "eslint-plugin-cypress": "^5.1.0",
     "globals": "^15.12.0",
@@ -29,5 +32,8 @@
   },
   "engines": {
     "node": ">=22"
+  },
+  "cypress-cucumber-preprocessor": {
+    "stepDefinitions": "cypress/e2e/step_definitions/**/*.js"
   }
 }

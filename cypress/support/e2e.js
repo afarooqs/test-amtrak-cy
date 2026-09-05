@@ -20,6 +20,16 @@ Cypress.Commands.add("stubThirdPartyBeacons", () => {
     "**/hotjar.com/**",
     "**/newrelic.com/**",
     "**/nr-data.net/**",
+    "**/akstat.io/**",
+    "**/go-mpulse.net/**",
+    "**/*.mpulse.net/**",
+    "**/ensighten.com/**",
+    "**/*.adobedtm.com/**",
+    "**/omtrdc.net/**",
+    "**/demdex.net/**",
+    "**/scorecardresearch.com/**",
+    "**/qualtrics.com/**",
+    "**/quantummetric.com/**",
   ];
   for (const url of blocked) {
     cy.intercept(url, { statusCode: 204, body: "" });

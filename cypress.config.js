@@ -1,6 +1,13 @@
 const dns = require("node:dns");
 const { defineConfig } = require("cypress");
 const { plugin: cypressGrepPlugin } = require("@cypress/grep/plugin");
+const createBundler = require("@bahmutov/cypress-esbuild-preprocessor");
+const {
+  addCucumberPreprocessorPlugin,
+} = require("@badeball/cypress-cucumber-preprocessor");
+const {
+  createEsbuildPlugin,
+} = require("@badeball/cypress-cucumber-preprocessor/esbuild");
 
 // GitHub-hosted runners often have unreachable IPv6. Node 17+ tries AAAA
 // first, so Cypress's visit/proxy hangs with ETIMEDOUT against Amtrak/Akamai
@@ -20,7 +27,7 @@ module.exports = defineConfig({
   screenshotsFolder: "cypress/screenshots",
   screenshotOnRunFailure: true,
   retries: {
-    runMode: 1,
+    runMode: 2,
     openMode: 0,
   },
   defaultCommandTimeout: 15_000,
@@ -43,15 +50,25 @@ module.exports = defineConfig({
     saveAllAttempts: true,
     videoOnFailOnly: false,
   },
+  env: {
+    "cypress-cucumber-preprocessor": {
+      stepDefinitions: "cypress/e2e/step_definitions/**/*.js",
+    },
+  },
   e2e: {
-    // No baseUrl: Cypress would HTTP/1.1-proxy Amtrak during spec setup and
-    // time out on GitHub-hosted runners. Tests open the app through Chrome CDP.
-    specPattern: "cypress/e2e/**/*.cy.js",
+    specPattern: "cypress/e2e/features/**/*.feature",
     supportFile: "cypress/support/e2e.js",
     testIsolation: true,
-    setupNodeEvents(on, config) {
+    async setupNodeEvents(on, config) {
       require("cypress-mochawesome-reporter/plugin")(on);
       cypressGrepPlugin(config);
+      await addCucumberPreprocessorPlugin(on, config);
+      on(
+        "file:preprocessor",
+        createBundler({
+          plugins: [createEsbuildPlugin(config)],
+        }),
+      );
       on("before:browser:launch", (browser, launchOptions) => {
         if (browser.family === "chromium") {
           launchOptions.args.push(

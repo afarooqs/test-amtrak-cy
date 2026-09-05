@@ -144,16 +144,23 @@ class HomePage {
 
   open() {
     const url = "https://www.amtrak.com/home";
+    const previousPageLoadTimeout = Cypress.config("pageLoadTimeout");
     // Do not cy.visit Amtrak: Cypress would fetch it through Node (HTTP/1.1),
     // which GitHub runners stall on. Let Chrome navigate itself over HTTP/2.
-    cy.visit("https://example.com", { failOnStatusCode: false });
-    cy.window().then((win) => {
-      win.location.href = url;
+    // Stub trackers *before* that hop so analytics cannot hold window.load
+    // for pageLoadTimeout (the flake seen in CI).
+    cy.visit("https://example.com", {
+      failOnStatusCode: false,
+      retryOnNetworkFailure: true,
+      timeout: 30_000,
     });
-    cy.location("hostname", { timeout: 120_000 }).should(
-      "eq",
-      "www.amtrak.com",
-    );
+    cy.stubThirdPartyBeacons();
+    Cypress.config("pageLoadTimeout", 45_000);
+    cy.window().then((win) => {
+      win.location.replace(url);
+    });
+    cy.location("hostname", { timeout: 45_000 }).should("eq", "www.amtrak.com");
+    Cypress.config("pageLoadTimeout", previousPageLoadTimeout);
     cy.stubThirdPartyBeacons();
     this.dismissCookieBanner();
     this.fareFinder().should("be.visible");
